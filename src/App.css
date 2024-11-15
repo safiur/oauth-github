@@ -1,233 +1,59 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 /* frontend/src/App.css */
-.container {
+.app {
   padding: 20px;
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: center;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  background-color: #f6f8fa;
 }
 
-.loading-container {
+.loading {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 200px;
-}
-
-.loading-text {
   font-size: 18px;
   color: #24292e;
 }
 
-.error-message {
-  color: #d73a49;
-  background-color: #ffeef0;
+.error {
+  color: #cb2431;
+  text-align: center;
   padding: 10px;
+  margin: 10px 0;
+  background-color: #ffeef0;
+  border: 1px solid #ffdce0;
   border-radius: 6px;
-  margin-bottom: 10px;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
 }
 
 .login-button {
-  padding: 10px 20px;
+  padding: 12px 24px;
   font-size: 16px;
-  cursor: pointer;
-  background-color: #2ea44f;
+  background-color: #24292e;
   color: white;
   border: none;
   border-radius: 6px;
-  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .login-button:hover {
-  background-color: #2c974b;
+  background-color: #2c3238;
 }
 
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+.login-button:disabled {
+  background-color: #6a737d;
+  cursor: not-allowed;
 }
 
-.modal-content {
-  background-color: white;
+.dashboard-container {
+  max-width: 800px;
+  margin: 0 auto;
   padding: 20px;
-  border-radius: 8px;
-  max-width: 300px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.modal-title {
-  margin: 0 0 10px 0;
-  color: #24292e;
-}
-
-.modal-text {
-  color: #586069;
-}
-
-.modal-buttons {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 20px;
-}
-
-.cancel-button {
-  padding: 8px 16px;
-  cursor: pointer;
-  background-color: #6e7681;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  margin-right: 10px;
-  font-weight: 600;
-}
-
-.cancel-button:hover {
-  background-color: #636c77;
-}
-
-.confirm-button {
-  padding: 8px 16px;
-  cursor: pointer;
-  background-color: #d73a49;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-}
-
-.confirm-button:hover {
-  background-color: #cb2431;
-}
-
-.user-card {
-  background-color: #f6f8fa;
-  border-radius: 10px;
-  padding: 20px;
-  margin-top: 20px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin: 20px 0;
-  border: 3px solid #fff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.welcome-text {
-  margin: 10px 0;
-  color: #24292e;
-}
-
-.bio-text {
-  color: #586069;
-  margin: 10px 0;
-}
-
-.stats-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin: 20px 0;
-  padding: 10px;
-  background-color: white;
-  border-radius: 6px;
-}
-
-.stat-item {
-  padding: 10px;
-  background-color: #f6f8fa;
-  border-radius: 4px;
-}
-
-.stat-value {
-  font-weight: bold;
-  color: #24292e;
-}
-
-.stat-label {
-  color: #586069;
-  font-size: 14px;
-}
-
-.logout-button {
-  padding: 8px 16px;
-  cursor: pointer;
-  background-color: #d73a49;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-}
-
-.logout-button:hover {
-  background-color: #cb2431;
-}
-
-/* Add hover effects */
-button {
-  transition: background-color 0.2s ease;
-}
-
-/* Add responsiveness */
-@media (max-width: 480px) {
-  .container {
-    padding: 10px;
-  }
-
-  .stats-container {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-content {
-    margin: 0 20px;
-  }
 }

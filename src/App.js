@@ -1,183 +1,82 @@
 // frontend/src/App.js
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
+import CallbackHandler from './components/CallbackHandler';
 import './App.css';
 
+// frontend/src/App.js
 function App() {
   const [user, setUser] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('github_token');
-    if (!token) {
-      setUser(null);
-    }
-  }, []);
+    const checkAuth = async () => {
+      const token = localStorage.getItem('github_token');
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
 
-  useEffect(() => {
-    const processCode = async () => {
-      if (user || loading) return;
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-
-      if (code && sessionStorage.getItem('processedCode') !== code) {
-        await handleCallback(code);
+      try {
+        const response = await axios.get('https://api.github.com/user', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json'
+          }
+        });
+        setUser(response.data);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        localStorage.removeItem('github_token');
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
     };
 
-    processCode();
-  }, [user, loading]);
+    checkAuth();
+  }, []);
 
-  const handleCallback = async (code) => {
-    if (loading) return;
-    
-    setLoading(true);
-    setError(null);
-
-    try {
-      sessionStorage.setItem('processedCode', code);
-      const response = await axios.post('http://localhost:5001/api/auth/callback', { code });
-      
-      if (response.data.user) {
-        setUser(response.data.user);
-        localStorage.setItem('github_token', response.data.accessToken);
-        window.history.pushState({}, null, '/');
-      }
-    } catch (error) {
-      console.error('Authentication error:', error.response?.data?.error || error.message);
-      setError(error.response?.data?.error || 'Authentication failed');
-      sessionStorage.removeItem('processedCode');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogin = () => {
-    sessionStorage.removeItem('processedCode');
-    window.location.href = 'http://localhost:5001/api/auth/github';
-  };
-
-  const handleLogoutClick = () => {
-    setShowLogoutConfirm(true);
-  };
-
-  const confirmLogout = async () => {
-    try {
-      const token = localStorage.getItem('github_token');
-      
-      localStorage.clear();
-      sessionStorage.clear();
-      setUser(null);
-      setError(null);
-      setLoading(false);
-      setShowLogoutConfirm(false);
-      window.history.pushState({}, null, '/');
-
-      if (token) {
-        try {
-          await axios.delete('https://api.github.com/applications/tokens/oauth', {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          });
-        } catch (error) {
-          console.log('Error revoking token:', error);
-        }
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-      setError('Failed to logout properly');
-    }
-  };
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
 
   return (
-    <div className="container">
-      {loading && (
-        <div className="loading-container">
-          <div className="loading-text">Loading...</div>
-        </div>
-      )}
-      
-      {error && (
-        <div>
-          <div className="error-message">{error}</div>
-          <button onClick={handleLogin} className="login-button">
-            Try Again
-          </button>
-        </div>
-      )}
-
-      {!loading && !error && !user && (
-        <button onClick={handleLogin} className="login-button">
-          Login with GitHub
-        </button>
-      )}
-
-      {showLogoutConfirm && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3 className="modal-title">Confirm Logout</h3>
-            <p className="modal-text">Are you sure you want to logout?</p>
-            <div className="modal-buttons">
-              <button
-                onClick={() => setShowLogoutConfirm(false)}
-                className="cancel-button"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmLogout}
-                className="confirm-button"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!loading && !error && user && (
-        <div className="user-card">
-          <img 
-            src={user.avatar_url} 
-            alt="Profile" 
-            className="avatar"
+    <Router>
+      <div className="app">
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              user ? (
+                <Navigate to="/dashboard" replace />
+              ) : (
+                <Login />
+              )
+            } 
           />
-          <h2 className="welcome-text">
-            Welcome, {user.name || user.login}!
-          </h2>
-          {user.bio && (
-            <p className="bio-text">{user.bio}</p>
-          )}
-          
-          <div className="stats-container">
-            <div className="stat-item">
-              <div className="stat-value">{user.public_repos}</div>
-              <div className="stat-label">Repositories</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-value">{user.followers}</div>
-              <div className="stat-label">Followers</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-value">{user.following}</div>
-              <div className="stat-label">Following</div>
-            </div>
-          </div>
-
-          <button 
-            onClick={handleLogoutClick}
-            className="logout-button"
-          >
-            Logout
-          </button>
-        </div>
-      )}
-    </div>
+          <Route 
+            path="/dashboard" 
+            element={
+              !user && !localStorage.getItem('github_token') ? (
+                <Navigate to="/" replace />
+              ) : (
+                <Dashboard user={user} setUser={setUser} />
+              )
+            } 
+          />
+          <Route 
+            path="/callback" 
+            element={<CallbackHandler setUser={setUser} />} 
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
-
 export default App;
